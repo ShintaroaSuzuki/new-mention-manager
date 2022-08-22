@@ -1,0 +1,7 @@
+.env
+node_modules
+dist
+*.lock
+yarn-error.log
+terraform/.terraform
+terraform/lambda
