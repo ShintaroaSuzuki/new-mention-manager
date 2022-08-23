@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_event_rule" "mention_manager_lambda_event_rule" {
   name = "mention_manager_lambda_event_rule"
-  schedule_expression = "cron(0 16 * * ? *)"
+  schedule_expression = "cron(0 7 * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "mention_manager_lambda_target" {

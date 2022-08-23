@@ -5,3 +5,4 @@ dist
 yarn-error.log
 terraform/.terraform
 terraform/lambda
+terraform/.terraform.lock.hcl

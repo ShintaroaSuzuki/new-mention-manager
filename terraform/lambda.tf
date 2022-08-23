@@ -20,4 +20,5 @@ resource "aws_lambda_function" "mention_manager" {
       USER_NAME        = var.user_name
     }
   }
+  timeout = 30
 }

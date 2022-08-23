@@ -2,9 +2,24 @@ const fetch = require("node-fetch-commonjs");
 const dotenv = require("dotenv");
 dotenv.config();
 
+export const generateBlackListChannelQuery = async (channels: string[]) => {
+  let queryString = "";
+  Promise.all(
+    channels.map((channel) =>
+      (async () => {
+        queryString += `-in:${channel} `;
+      })()
+    )
+  );
+  return queryString;
+};
+
 export const getMessages = async () => {
+  const blackListChannels = ["#ofc_timesheet"];
   const params = {
-    query: `-hasmy::${process.env.REACTION_NAME}: "@${process.env.USER_NAME}"`,
+    query: `-hasmy::${process.env.REACTION_NAME}: "@${
+      process.env.USER_NAME
+    }" ${generateBlackListChannelQuery(blackListChannels)}`,
   };
   const query = new URLSearchParams(params);
   const response = await fetch(

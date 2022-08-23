@@ -1,0 +1,67 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - 'main'
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  SLACK_USER_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
+  SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+  REACTION_NAME: ${{ secrets.REACTION_NAME }}
+  USER_NAME: ${{ secrets.USER_NAME }}
+
+jobs:
+  builds:
+    name: deploy to lambda 
+    if: ${{ github.event_name == 'push' || github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install --production
+
+      - name: build
+        run: npm run build
+
+      - name: configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: $AWS_ACCESS_KEY_ID
+          aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+          aws-region: $AWS_REGION
+
+      - name: terraform setup
+        uses: hashicorp/setup-terraform@v2
+
+      - name: terraform plan
+        run: |
+          cd terraform
+          terraform init
+          terraform plan \
+            -var="slack_bot_token=$SLACK_BOT_TOKEN" \
+            -var="slack_user_token=$SLACK_USER_TOKEN" \
+            -var="slack_channel_id=$SLACK_CHANNEL_ID" \
+            -var="reaction_name=$REACTION_NAME" \
+            -var="user_name=$USER_NAME"
+
+      - name: terraform apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve \
+            -var="slack_bot_token=$SLACK_BOT_TOKEN" \
+            -var="slack_user_token=$SLACK_USER_TOKEN" \
+            -var="slack_channel_id=$SLACK_CHANNEL_ID" \
+            -var="reaction_name=$REACTION_NAME" \
+            -var="user_name=$USER_NAME"
