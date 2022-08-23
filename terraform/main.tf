@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "x-point-1-mention-manager"
+    bucket = "shintaroa-mention-manager"
     region = "ap-northeast-1"
     key    = "terraform.tfstate"
   }
